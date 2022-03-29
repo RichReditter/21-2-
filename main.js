@@ -1,26 +1,76 @@
-const imgs = [
-    'https://go64.ru/upload/quickly/cat-2143332_1280.jpg',
-    'https://cdnn21.img.ria.ru/images/151546/28/1515462835_0:0:1036:587_600x0_80_0_0_a75f922e8b052d966122e1c9dc40feb4.jpg',
-    'https://cdnn21.img.ria.ru/images/07e5/0a/0b/1753974972_0:117:3072:1845_1920x0_80_0_0_5fbad162a71b5c081cc51da0a8ed6f27.jpg'
-]
-function loading(url){
-    return new Promise(function(resolve, reject){
-        const img = document.createElement('img')
-        img.src = url;
-        img.onerror = () => {
-            reject('error')
+// final variant
+// спросить , зачем promise в xhr
+const request = (url) => {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onload = () => {
+        xhr.status === 200 ? resolve(xhr.response) : reject(xhr.statusText);
         }
-        img.onload = () => {
-            resolve(img)
-        }
+        xhr.onerror = () => reject(xhr.statusText);
+        xhr.send();
     })
 }
-const promises = imgs.map( img => loading(img))
-Promise.race(promises)
-.then( image => {
-    document.body.append(image)
-})
+
+document.body.querySelector('#get-text').onclick = () => {
+    request('https://itchief.ru/examples/ajax/01.html')
+  .then( data =>{
+      document.querySelector('#result').innerHTML = data
+  })
+  .catch( error => {
+      console.log()
+  })
+}
+
+//  спросить почему это не работает??
+// const getText = document.querySelector('#get-text');
+// const promise = new Promise((resolve, reject) => {
+//     setTimeout(() =>{
+//         getText.onclick = () =>{
+//             request('https://itchief.ru/examples/ajax/01.html', data => {
+//                 if(data){
+//                     resolve(data)
+//                 }
+//                 else{ 
+//                     reject(data)
+//                 }
+//             })
+//         }
+            
+//     },2500)
+    
+// });
+// promise
+// .then( data => {
+//     document.querySelector('#result').innerHTML = data;
+// })
+// .catch( () => {
+//     console.log('error detected')
+// })
+// .finally( () => {
+//     console.log('код работает, вроде...')
+// })
+
+// 
+// 
+// 
+const randomColor = Math.floor(Math.random()*1000000)
+
+const changingColorDiv = document.body.querySelector('#colorChanger')
 
 
 
+const sleep = ms => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
+  sleep(5000).then( () => {
+    changingColorDiv.style.backgroundColor = `#${randomColor}`
+  })
+  sleep(5500).then( () => {
+    changingColorDiv.style.backgroundColor = 'white'
+    changingColorDiv.style.backgroundColor = `#${randomColor}`
+  })
+  sleep(5000).catch( () => {
+      console.log('ошибка')
+  })
